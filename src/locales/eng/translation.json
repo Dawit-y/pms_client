@@ -1494,5 +1494,7 @@
   "pln_month_id": "Month",
   "pdd_month_id": "Month",
   "adminstration": "Adminstration",
-  "planned_capacity_exceeds_design_capacity": "Planned capacity cannot exceed design capacity"
+  "planned_capacity_exceeds_design_capacity": "Planned capacity cannot exceed design capacity",
+  "unassigned_permissions": "Unassigned Permissions",
+  "assigned_permissions": "Assigned Permissions"
 }

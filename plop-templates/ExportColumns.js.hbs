@@ -1,0 +1,19 @@
+export const {{#if camelCaseName}}{{camelCaseName}}{{else}}{{camelCase pageName}}{{/if}}ExportColumns = [
+  {{#each columns}}
+  {
+    key: '{{this.name}}',
+    label: '{{this.label}}',
+    {{#if (eq this.type 'Number')}}
+    format: (val) => (val ? `${{ '{' }}${{ '{' }}Number(val).toLocaleString(){{ '}' }}{{ '}' }}` : '-'),
+    type: 'currency',
+    {{else if (eq this.type 'Date')}}
+    format: (val) => (val ? new Date(val).toLocaleDateString() : '-'),
+    type: 'date',
+    {{else if (eq this.type 'Boolean')}}
+    format: (val) => (val ? 'Yes' : 'No'),
+    {{else}}
+    format: (val) => val || '-',
+    {{/if}}
+  },
+  {{/each}}
+];

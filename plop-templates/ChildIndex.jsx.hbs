@@ -1,0 +1,117 @@
+import { useCallback, useEffect, memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
+
+import DeleteModal from '../../components/Common/DeleteModal';
+import FetchErrorHandler from '../../components/Common/FetchErrorHandler';
+import TableContainer from '../../components/Common/TableContainer';
+import { usePermissions } from '../../hooks/usePermissions';
+import {
+  useFetch{{pluralize capitalizedChildName}},
+  useDelete{{capitalizedChildName}},
+} from '../../queries/{{childName}}s_query';
+import { {{camelChildName}}ExportColumns } from '../../utils/exportColumns/{{camelChildName}}ExportColumns';
+import {{capitalizedChildName}}FormModal from './{{capitalizedChildName}}FormModal';
+import { use{{capitalizedChildName}}Columns } from './columns';
+
+function {{capitalizedChildName}}s({ isActive }) {
+  const { t } = useTranslation();
+  const { id: {{parentName}}Id } = useParams();
+  const { hasPermission } = usePermissions();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [{{camelChildName}}ToDelete, set{{capitalizedChildName}}ToDelete] = useState(null);
+  const [{{camelChildName}}ToEdit, set{{capitalizedChildName}}ToEdit] = useState(null);
+
+  const delete{{capitalizedChildName}}Mutation = useDelete{{capitalizedChildName}}({{parentName}}Id);
+
+  const handleEditClick = useCallback(({{camelChildName}}) => {
+    set{{capitalizedChildName}}ToEdit({{camelChildName}});
+    setIsModalOpen(true);
+  }, []);
+
+  const handleDeleteClick = useCallback(({{camelChildName}}) => {
+    set{{capitalizedChildName}}ToDelete({{camelChildName}});
+    setDeleteModal(true);
+  }, []);
+
+  const confirmDelete = async () => {
+    if ({{camelChildName}}ToDelete) {
+      try {
+        await delete{{capitalizedChildName}}Mutation.mutateAsync({{camelChildName}}ToDelete.{{primaryKey}});
+        setDeleteModal(false);
+        set{{capitalizedChildName}}ToDelete(null);
+      } catch (error) {
+        console.error('Failed to delete {{camelChildName}}:', error);
+      }
+    }
+  };
+
+  const {
+    data: result,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useFetch{{pluralize capitalizedChildName}}({{parentName}}Id, isActive);
+
+  useEffect(() => {
+    document.title = t('{{pluralize childName}}');
+  }, [t]);
+
+  const handleAddClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    set{{capitalizedChildName}}ToEdit(null);
+  }, []);
+
+  const columns = use{{capitalizedChildName}}Columns(
+    {{parentName}}Id,
+    handleEditClick,
+    handleDeleteClick,
+    hasPermission
+  );
+
+  if (isError) {
+    return <FetchErrorHandler error={error} refetch={refetch} />;
+  }
+
+  return (
+    <>
+      <TableContainer
+        data={result?.results ?? []}
+        columns={columns}
+        isLoading={isLoading}
+        isGlobalFilter={true}
+        isAddButton={hasPermission('{{permissionPrefix}}.add_{{permissionPrefix}}')}
+        isCustomPageSize={true}
+        isPagination={true}
+        onAddClick={handleAddClick}
+        tableName={t('{{pluralize childName}}')}
+        exportColumns={ {{camelChildName}}ExportColumns }
+        refetch={refetch}
+      />
+
+      <{{capitalizedChildName}}FormModal
+        isOpen={isModalOpen}
+        toggle={handleModalClose}
+        {{parentName}}Id={ {{parentName}}Id }
+        isEdit={!!{{camelChildName}}ToEdit}
+        {{camelChildName}}Data={ {{camelChildName}}ToEdit }
+      />
+
+      <DeleteModal
+        isOpen={deleteModal}
+        toggle={() => setDeleteModal(false)}
+        onDeleteClick={confirmDelete}
+        isPending={delete{{capitalizedChildName}}Mutation.isPending}
+        itemName={ {{camelChildName}}ToDelete ? `{{capitalizedChildName}} #${ {{camelChildName}}ToDelete.{{primaryKey}} }` : ''}
+      />
+    </>
+  );
+}
+
+export default memo({{capitalizedChildName}}s);

@@ -1,0 +1,27 @@
+import { get, post, put, del } from './axios';
+
+const BASE_URL = '/{{pageName}}/';
+const PRIMARY_KEY = '{{primaryKey}}';
+
+export const get{{pluralize capitalizedPageName}} = async (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = queryString
+    ? `${BASE_URL}?${queryString}`
+    : BASE_URL;
+
+  return await get(url);
+};
+
+export const add{{capitalizedPageName}} = (data) =>
+  post(BASE_URL, data);
+
+export const update{{capitalizedPageName}} = (data) => {
+  const id = data?.[PRIMARY_KEY];
+  return put(`${BASE_URL}${id}/`, data);
+};
+
+export const get{{capitalizedPageName}} = (id) =>
+  get(`${BASE_URL}${id}/`);
+
+export const delete{{capitalizedPageName}} = (id) =>
+  del(`${BASE_URL}${id}/`);

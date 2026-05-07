@@ -1,0 +1,29 @@
+import { useEffect } from 'react';
+import { Container } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+
+import Breadcrumbs from '../../components/Common/Breadcrumb';
+import {{capitalizedPageName}}sForm from './Form';
+
+const Add{{capitalizedPageName}} = () => {
+  const { t } = useTranslation();
+  useEffect(() => {
+    document.title = t('add_{{pageName}}');
+  }, [t]);
+
+  return (
+    <div className="page-content">
+      <Container fluid>
+        <Breadcrumbs
+          items={[
+            { label: t('{{pluralize pageName}}'), path: '/{{pageName}}s' },
+            { label: t('add_{{pageName}}'), active: true },
+          ]}
+        />
+        <{{capitalizedPageName}}sForm />
+      </Container>
+    </div>
+  );
+};
+
+export default Add{{capitalizedPageName}};

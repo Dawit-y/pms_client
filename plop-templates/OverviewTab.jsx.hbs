@@ -1,0 +1,115 @@
+import { useState } from 'react';
+import { Row, Col, Card, Badge, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
+
+import DeleteModal from '../../components/Common/DeleteModal';
+import { usePermissions } from '../../hooks/usePermissions';
+import { useDelete{{capitalizedPageName}} } from '../../queries/{{pageName}}s_query';
+
+function OverviewTab({ {{pageName}} }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const [deleteModal, setDeleteModal] = useState(false);
+  const delete{{capitalizedPageName}}Mutation = useDelete{{capitalizedPageName}}();
+
+  const handleDelete = async () => {
+    if ({{pageName}}?.{{primaryKey}}) {
+      await delete{{capitalizedPageName}}Mutation.mutateAsync({{pageName}}.{{primaryKey}});
+      navigate('/{{pageName}}s');
+    }
+  };
+
+  // Helper function to render field value based on type
+  const renderFieldValue = (field, value) => {
+    if (value === undefined || value === null) return '—';
+    
+    switch(field.type) {
+      case 'Boolean':
+        return value ? t('yes') : t('no');
+      case 'Number':
+        return typeof value === 'number' ? value.toLocaleString() : value;
+      case 'Date':
+        return new Date(value).toLocaleDateString();
+      default:
+        return value;
+    }
+  };
+
+  return (
+    <>
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h4 className="card-title mb-1">{{#if displayNameField}}{{pageName}}.{{displayNameField}}{{else}}{{pageName}}.{{primaryKey}}{{/if}}</h4>
+          <p className="text-muted mb-0">
+            {t('{{pageName}}_id')}: { {{pageName}}.{{primaryKey}} }
+          </p>
+        </div>
+        <div className="d-flex gap-2">
+          {hasPermission('{{permissionPrefix}}.edit_{{permissionPrefix}}') && (
+            <Button
+              variant="success"
+              onClick={() => navigate(`/{{pageName}}s/${ {{pageName}}.{{primaryKey}} }/edit`)}
+            >
+              <FaEdit className="me-1" /> {t('edit')}
+            </Button>
+          )}
+          {hasPermission('{{permissionPrefix}}.delete_{{permissionPrefix}}') && (
+            <Button variant="danger" onClick={() => setDeleteModal(true)}>
+              <FaTrash className="me-1" /> {t('delete')}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <Row className="mb-4">
+        {{#each columns}}
+        <Col md={6} className="mb-3">
+          <div className="mb-3">
+            <h6 className="text-muted">{t('{{label}}')}</h6>
+
+            {{#if (eq name "status")}}
+            <Badge
+              bg={getStatusBadgeColor({{@root.pageName}}.{{name}})}
+              className="px-3 py-2 fs-6"
+            >
+              { {{@root.pageName}}.{{name}} 
+                ? t({{@root.pageName}}.{{name}})
+                : t('unknown') }
+            </Badge>
+
+            {{else}}
+              {{#if (eq type "Boolean")}}
+              <Badge
+                bg={ {{@root.pageName}}.{{name}} ? 'success' : 'danger' }
+                className="px-3 py-2 fs-6"
+              >
+                { {{@root.pageName}}.{{name}} ? t('yes') : t('no') }
+              </Badge>
+
+              {{else}}
+              <p className="mb-0">
+                {renderFieldValue({ type: '{{type}}' }, {{@root.pageName}}.{{name}})}
+              </p>
+              {{/if}}
+            {{/if}}
+
+          </div>
+        </Col>
+        {{/each}}
+      </Row>
+
+      <DeleteModal
+        isOpen={deleteModal}
+        toggle={() => setDeleteModal(false)}
+        onDeleteClick={handleDelete}
+        isPending={delete{{capitalizedPageName}}Mutation.isPending}
+        itemName={ {{pageName}}.{{#if displayNameField}}{{displayNameField}}{{else}}title || name || 'item'{{/if}} }
+      />
+    </>
+  );
+}
+
+export default OverviewTab;

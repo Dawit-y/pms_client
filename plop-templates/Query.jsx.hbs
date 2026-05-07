@@ -1,0 +1,179 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+
+import {
+  get{{pluralize capitalizedPageName}},
+  get{{capitalizedPageName}},
+  add{{capitalizedPageName}},
+  update{{capitalizedPageName}},
+  delete{{capitalizedPageName}},
+} from '../helpers/{{pageName}}s_helper';
+
+const {{uppercase pageName}}_QUERY_KEY = ['{{pageName}}'];
+
+export const useFetch{{pluralize capitalizedPageName}} = (param = {}, isActive) => {
+  return useQuery({
+    queryKey: [...{{uppercase pageName}}_QUERY_KEY, 'fetch', param],
+    queryFn: () => get{{pluralize capitalizedPageName}}(param),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    enabled: isActive,
+  });
+};
+
+export const useFetch{{capitalizedPageName}} = (id) => {
+  return useQuery({
+    queryKey: [...{{uppercase pageName}}_QUERY_KEY, 'fetch', id],
+    queryFn: () => get{{capitalizedPageName}}(id),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    enabled: !!id,
+  });
+};
+
+export const useSearch{{pluralize capitalizedPageName}} = (searchParams) => {
+  return useQuery({
+    queryKey: [...{{uppercase pageName}}_QUERY_KEY, 'search', searchParams],
+    queryFn: () => get{{pluralize capitalizedPageName}}(searchParams || {}),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    enabled: !!searchParams && Object.keys(searchParams || {}).length > 0,
+  });
+};
+
+export const useAdd{{capitalizedPageName}} = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: add{{capitalizedPageName}},
+    meta: {
+      successMessage: t('added_successfully'),
+      errorMessage: t('add_failed'),
+    },
+    onMutate: async (new{{capitalizedPageName}}Payload) => {
+      await queryClient.cancelQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+
+      const previousData = queryClient.getQueryData({{uppercase pageName}}_QUERY_KEY);
+
+      queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, (oldData) => {
+        if (!oldData?.data) return oldData;
+        return {
+          ...oldData,
+          data: [
+            {
+              {{#if (ne primaryKey 'id')}}
+              {{primaryKey}}: Date.now(),
+              {{else}}
+              id: Date.now(),
+              {{/if}}
+              ...new{{capitalizedPageName}}Payload,
+              isPending: true,
+            },
+            ...oldData.data,
+          ],
+        };
+      });
+
+      return { previousData };
+    },
+
+    onError: (_err, _new{{capitalizedPageName}}, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, context.previousData);
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+    },
+  });
+};
+
+export const useUpdate{{capitalizedPageName}} = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: update{{capitalizedPageName}},
+    meta: {
+      successMessage: t('updated_successfully'),
+      errorMessage: t('update_failed'),
+    },
+
+    onMutate: async (updated{{capitalizedPageName}}) => {
+      await queryClient.cancelQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+
+      const previousData = queryClient.getQueryData({{uppercase pageName}}_QUERY_KEY);
+
+      queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, (oldData) => {
+        if (!oldData?.data) return oldData;
+        return {
+          ...oldData,
+          data: oldData.data.map(({{pageName}}) =>
+            {{pageName}}.{{primaryKey}} === updated{{capitalizedPageName}}.{{primaryKey}}
+              ? { ...{{pageName}}, ...updated{{capitalizedPageName}} }
+              : {{pageName}}
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+
+    onError: (_err, _vars, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, context.previousData);
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+    },
+  });
+};
+
+export const useDelete{{capitalizedPageName}} = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: delete{{capitalizedPageName}},
+
+    meta: {
+      successMessage: t('deleted_successfully'),
+      errorMessage: t('delete_failed'),
+    },
+
+    onMutate: async ({{pageName}}Id) => {
+      await queryClient.cancelQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+
+      const previousData = queryClient.getQueryData({{uppercase pageName}}_QUERY_KEY);
+
+      queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, (oldData) => {
+        if (!oldData?.data) return oldData;
+        return {
+          ...oldData,
+          data: oldData.data.filter(
+            ({{pageName}}) => {{pageName}}.{{primaryKey}} !== parseInt({{pageName}}Id)
+          ),
+        };
+      });
+
+      return { previousData };
+    },
+
+    onError: (_err, _vars, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData({{uppercase pageName}}_QUERY_KEY, context.previousData);
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: {{uppercase pageName}}_QUERY_KEY });
+    },
+  });
+};

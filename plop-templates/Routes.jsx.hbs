@@ -1,0 +1,29 @@
+import { lazy } from 'react';
+
+const {{capitalizedPageName}}s = lazy(() => import('../pages/{{pageName}}s'));
+const Add{{capitalizedPageName}} = lazy(() => import('../pages/{{pageName}}s/Add{{capitalizedPageName}}'));
+const {{capitalizedPageName}}Details = lazy(() => import('../pages/{{pageName}}s/Detail'));
+const Edit{{capitalizedPageName}} = lazy(() => import('../pages/{{pageName}}s/Edit{{capitalizedPageName}}'));
+const {{capitalizedPageName}}sLayout = lazy(() => import('../pages/{{pageName}}s/Layout'));
+
+const {{camelPageName}}Routes = {
+  path: '/{{pageName}}s',
+  element: <{{capitalizedPageName}}sLayout />,
+  permission: '{{permissionPrefix}}.view_{{permissionPrefix}}',
+  children: [
+    { index: true, element: <{{capitalizedPageName}}s /> },
+    {
+      path: 'add',
+      element: <Add{{capitalizedPageName}} />,
+      permission: '{{permissionPrefix}}.add_{{permissionPrefix}}',
+    },
+    { path: ':id/:tab?', element: <{{capitalizedPageName}}Details /> },
+    {
+      path: ':id/edit',
+      element: <Edit{{capitalizedPageName}} />,
+      permission: '{{permissionPrefix}}.edit_{{permissionPrefix}}',
+    },
+  ],
+};
+
+export default {{camelPageName}}Routes;

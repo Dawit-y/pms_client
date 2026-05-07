@@ -1,0 +1,46 @@
+import { useEffect } from 'react';
+import { Container, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
+
+import Breadcrumbs from '../../components/Common/Breadcrumb';
+import { useFetch{{capitalizedPageName}} } from '../../queries/{{pageName}}s_query';
+import {{capitalizedPageName}}sForm from './Form';
+
+const Edit{{capitalizedPageName}} = () => {
+  const { t } = useTranslation();
+  useEffect(() => {
+    document.title = t('edit_{{pageName}}');
+  }, [t]);
+  const { id } = useParams();
+  const { data: {{pageName}}, isLoading } = useFetch{{capitalizedPageName}}(id);
+
+  if (isLoading) {
+    return (
+      <div className="page-content">
+        <Container
+          fluid
+          className="w-100 h-100 d-flex align-items-center justify-content-center"
+        >
+          <Spinner animation="border" variant="primary" />
+        </Container>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-content">
+      <Container fluid>
+        <Breadcrumbs
+          items={[
+            { label: t('{{pluralize pageName}}'), path: '/{{pageName}}s' },
+            { label: t('edit_{{pageName}}'), active: true },
+          ]}
+        />
+        <{{capitalizedPageName}}sForm isEdit={true} rowData={ {{pageName}} } />
+      </Container>
+    </div>
+  );
+};
+
+export default Edit{{capitalizedPageName}};

@@ -1,0 +1,159 @@
+import { useFormik } from 'formik';
+import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { Form, Row, Modal, Button, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import * as Yup from 'yup';
+
+import AsyncSelectField from '../../components/Common/AsyncSelectField';
+import DatePicker from '../../components/Common/DatePicker';
+import Input from '../../components/Common/Input';
+import NumberField from '../../components/Common/NumberField';
+import {
+  useAdd{{capitalizedChildName}},
+  useUpdate{{capitalizedChildName}},
+} from '../../queries/{{childName}}s_query';
+
+const {{capitalizedChildName}}FormModal = ({
+  isOpen,
+  toggle,
+  {{parentName}}Id,
+  isEdit = false,
+  {{camelChildName}}Data = {},
+}) => {
+  const { t } = useTranslation();
+
+  const add{{capitalizedChildName}}Mutation = useAdd{{capitalizedChildName}}({{parentName}}Id);
+  const update{{capitalizedChildName}}Mutation = useUpdate{{capitalizedChildName}}({{parentName}}Id);
+
+  const validationSchema = Yup.object().shape({
+    {{#each columns}}
+    {{this.name}}: Yup.{{#if (eq this.type 'Number')}}number(){{else if (eq this.type 'Boolean')}}boolean(){{else}}string(){{/if}}
+      .required(t('field_required')){{#if (eq this.name 'amount')}}.positive('Amount must be positive'){{/if}},
+    {{/each}}
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      {{#each columns}}
+      {{this.name}}: {{#if (eq this.type 'Boolean')}}
+        isEdit ? !!{{@root.camelChildName}}Data.{{this.name}} : false{{else}}
+        isEdit ? {{@root.camelChildName}}Data.{{this.name}} || '' : ''{{/if}},
+      {{/each}}
+    },
+    validationSchema,
+    enableReinitialize: true,
+
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        if (isEdit) {
+          await update{{capitalizedChildName}}Mutation.mutateAsync({
+            {{@root.primaryKey}}: {{camelChildName}}Data.{{@root.primaryKey}},
+            ...values,
+          });
+        } else {
+          await add{{capitalizedChildName}}Mutation.mutateAsync(values);
+        }
+        resetForm();
+        toggle();
+      } catch {
+        // Error handling is managed globally by QueryProvider
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      formik.resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  const isMutationPending =
+    add{{capitalizedChildName}}Mutation.isPending || update{{capitalizedChildName}}Mutation.isPending;
+
+  return (
+    <Modal size="xl" show={isOpen} onHide={toggle} centered={true}>
+      <Modal.Header closeButton>
+        <Modal.Title>
+          {isEdit
+            ? t('edit_{{childName}}', { id: {{camelChildName}}Data.{{primaryKey}} })
+            : t('add_{{childName}}')}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form noValidate onSubmit={formik.handleSubmit}>
+          <Row>
+            {{#each columns}}
+            {{#if (eq this.type 'Number')}}
+            <NumberField
+              formik={formik}
+              fieldId={'{{this.name}}'}
+            />
+            {{else if (eq this.type 'Boolean')}}
+            <Input
+              type="checkbox"
+              formik={formik}
+              fieldId={'{{this.name}}'}
+            />
+            {{else if (eq this.type 'Date')}}
+            <DatePicker
+              formik={formik}
+              fieldId={'{{this.name}}'}
+            />
+            {{else if (eq this.type 'Select')}}
+            <AsyncSelectField
+              formik={formik}
+              fieldId={'{{this.name}}'}
+              // TODO: Add options for this select field
+            />
+            {{else}}
+            <Input
+              formik={formik}
+              fieldId={'{{this.name}}'}
+            />
+            {{/if}}
+            {{/each}}
+          </Row>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="secondary"
+          onClick={toggle}
+          disabled={isMutationPending}
+        >
+          {t('cancel')}
+        </Button>
+        <Button
+          variant="success"
+          onClick={formik.submitForm}
+          disabled={
+            formik.isSubmitting ||
+            isMutationPending ||
+            !formik.isValid ||
+            !formik.dirty
+          }
+        >
+          {isMutationPending && (
+            <Spinner size="sm" className="me-1" animation="border" />
+          )}
+          {isEdit ? t('update') : t('save')}
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+{{capitalizedChildName}}FormModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired,
+  {{parentName}}Id: PropTypes.string.isRequired,
+  isEdit: PropTypes.bool,
+  {{camelChildName}}Data: PropTypes.object,
+};
+
+export default {{capitalizedChildName}}FormModal;

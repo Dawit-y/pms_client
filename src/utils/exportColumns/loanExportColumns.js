@@ -1,0 +1,106 @@
+export const loanExportColumns = [
+  {
+    key: 'pln_year_id',
+    label: 'pln year id',
+    format: (val) => val || '-',
+  },
+  {
+    key: 'pln_requested_amount',
+    label: 'pln requested amount',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_date_requested',
+    label: 'pln date requested',
+    format: (val) => (val ? new Date(val).toLocaleDateString() : '-'),
+    type: 'date',
+  },
+  {
+    key: 'pln_amount_granted',
+    label: 'pln amount granted',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_bank_id',
+    label: 'pln bank id',
+    format: (val) => val || '-',
+  },
+  {
+    key: 'pln_bank_released_date',
+    label: 'pln bank released date',
+    format: (val) => (val ? new Date(val).toLocaleDateString() : '-'),
+    type: 'date',
+  },
+  {
+    key: 'pln_confirmed_receipt',
+    label: 'pln confirmed receipt',
+    format: (val) => (val ? 'Yes' : 'No'),
+  },
+  {
+    key: 'pln_request_operational',
+    label: 'pln request operational',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_request_machinery',
+    label: 'pln request machinery',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_request_project',
+    label: 'pln request project',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_request_supplier',
+    label: 'pln request supplier',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_request_other',
+    label: 'pln request other',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_released_operational',
+    label: 'pln released operational',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_released_machinery',
+    label: 'pln released machinery',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_released_project',
+    label: 'pln released project',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_released_supplier',
+    label: 'pln released supplier',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_released_other',
+    label: 'pln released other',
+    format: (val) => (val ? `$${Number(val).toLocaleString()}` : '-'),
+    type: 'currency',
+  },
+  {
+    key: 'pln_remark',
+    label: 'pln remark',
+    format: (val) => val || '-',
+  },
+];

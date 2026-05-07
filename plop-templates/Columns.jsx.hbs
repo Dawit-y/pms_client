@@ -1,0 +1,65 @@
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router';
+
+import ActionsCell from '../../components/Common/ActionsCell';
+import { snColumn } from '../../components/Common/TableContainer/snColumnDef';
+
+export const use{{capitalizedPageName}}Columns = (onDelete, hasPermission) => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+
+  const searchString = searchParams.toString();
+  const queryString = searchString ? `?${searchString}` : '';
+
+  const columns = useMemo(() => [
+    snColumn,
+    {{#each columns}}
+    {
+      accessorKey: '{{this.name}}',
+      header: t('{{this.name}}'),
+      cell: (info) => info.getValue(),
+      {{#if (eq this.type 'Number')}}
+      meta: {
+        filterVariant: 'range',
+      },
+      filterFn: 'between',
+      {{/if}}
+    },
+    {{/each}}
+    {
+      header: t('actions'),
+      id: 'actions',
+      size: 100,
+      cell: (info) => {
+        const id = info.row.original.{{@root.primaryKey}};
+
+        return (
+          <ActionsCell
+            id={id}
+            onView={() => navigate(`/{{@root.pageName}}s/${id}${queryString}`)}
+            onEdit={
+              hasPermission('{{permissionPrefix}}.edit_{{permissionPrefix}}')
+                ? () => navigate(`/{{@root.pageName}}s/${id}/edit${queryString}`)
+                : undefined
+            }
+            onDelete={
+              hasPermission('{{permissionPrefix}}.delete_{{permissionPrefix}}')
+                ? () => onDelete(info.row.original)
+                : undefined
+            }
+          />
+        );
+      },
+    },
+  ], [
+    t,
+    navigate,
+    queryString,
+    hasPermission,
+    onDelete,
+  ]);
+
+  return columns;
+};

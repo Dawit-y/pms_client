@@ -1,0 +1,116 @@
+import { useCallback, useEffect, memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams, useOutletContext } from 'react-router';
+
+import AdvancedSearch from '../../components/Common/AdvancedSearch';
+import Breadcrumb from '../../components/Common/Breadcrumb';
+import DeleteModal from '../../components/Common/DeleteModal';
+import TableContainer from '../../components/Common/TableContainer';
+import { usePermissions } from '../../hooks/usePermissions';
+import { useUrlPagination } from '../../hooks/useUrlPagination';
+import { useDelete{{capitalizedPageName}}, useSearch{{pluralize capitalizedPageName}} } from '../../queries/{{pageName}}s_query';
+import { {{camelPageName}}ExportColumns } from '../../utils/exportColumnsForLists';
+import { use{{capitalizedPageName}}Columns } from './columns';
+
+function {{pluralize capitalizedPageName}}() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryString = searchParams.toString();
+  const { pageFilter, searchConfig } = useOutletContext();
+  const { hasPermission } = usePermissions();
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [{{camelPageName}}ToDelete, set{{capitalizedPageName}}ToDelete] = useState(null);
+
+  const delete{{capitalizedPageName}}Mutation = useDelete{{capitalizedPageName}}();
+
+  const handleDeleteClick = useCallback(({{camelPageName}}) => {
+    set{{capitalizedPageName}}ToDelete({{camelPageName}});
+    setDeleteModal(true);
+  }, []);
+
+  const handleDuplicateClick = useCallback(
+    ({{camelPageName}}) => {
+      navigate(`/{{pageName}}s/add${queryString ? `?${queryString}` : ''}`, {
+        state: { duplicateData: {{camelPageName}} },
+      });
+    },
+    [navigate, queryString]
+  );
+
+  const confirmDelete = async () => {
+    if ({{camelPageName}}ToDelete?.{{@root.primaryKey}}) {
+      try {
+        await delete{{capitalizedPageName}}Mutation.mutateAsync({{camelPageName}}ToDelete.{{@root.primaryKey}});
+        setDeleteModal(false);
+        set{{capitalizedPageName}}ToDelete(null);
+      } catch (error) {
+        console.error('Failed to delete {{pageName}}:', error);
+      }
+    }
+  };
+
+  const { pagination, onChange } = useUrlPagination(
+    pageFilter.filters,
+    pageFilter.setFilters
+  );
+
+  useEffect(() => {
+    document.title = t('{{pluralize capitalizedPageName}}');
+  }, [t]);
+
+  const handleAddClick = useCallback(() => {
+    navigate(`/{{pageName}}s/add${queryString ? `?${queryString}` : ''}`);
+  }, [navigate, queryString]);
+
+  const columns = use{{capitalizedPageName}}Columns(
+    handleDeleteClick,
+    hasPermission,
+    handleDuplicateClick
+  );
+
+  return (
+    <>
+      <div className="page-content">
+        <Breadcrumb items={[{ label: t('{{pluralize pageName}}'), active: true }]} />
+        <AdvancedSearch
+          pageFilter={pageFilter}
+          allowEmptySearch={true}
+          {...searchConfig}
+        >
+          {({ result, isLoading }) => {
+            return (
+              <TableContainer
+                data={result?.results ?? []}
+                columns={columns}
+                isLoading={isLoading}
+                isGlobalFilter={true}
+                isAddButton={hasPermission('{{permissionPrefix}}.add_{{permissionPrefix}}')}
+                isCustomPageSize={true}
+                isPagination={true}
+                onAddClick={handleAddClick}
+                tableName={t('{{pluralize pageName}}')}
+                exportColumns={ {{camelPageName}}ExportColumns }
+                paginationState={pagination}
+                isServerSidePagination={true}
+                onPaginationChange={onChange}
+                totalRows={result?.pagination?.total}
+                pageCount={result?.pagination?.total_pages}
+              />
+            );
+          }}
+        </AdvancedSearch>
+
+        <DeleteModal
+          isOpen={deleteModal}
+          toggle={() => setDeleteModal(false)}
+          onDeleteClick={confirmDelete}
+          isPending={delete{{capitalizedPageName}}Mutation.isPending}
+          itemName={ {{camelPageName}}ToDelete ? `{{#if displayNameField}}{{camelPageName}}ToDelete.{{displayNameField}}{{else}}{{camelPageName}}ToDelete.id{{/if}}` : '' }
+        />
+      </div>
+    </>
+  );
+}
+
+export default memo({{pluralize capitalizedPageName}});

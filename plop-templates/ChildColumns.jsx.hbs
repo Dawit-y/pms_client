@@ -1,0 +1,78 @@
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router';
+
+import ActionsCell from '../../components/Common/ActionsCell';
+import { snColumn } from '../../components/Common/TableContainer/snColumnDef';
+
+export const use{{capitalizedChildName}}Columns = (
+  {{parentName}}Id,
+  onEdit,
+  onDelete,
+  hasPermission
+) => {
+  const navigate = useNavigate();
+
+  const columns = useMemo(() => [
+    snColumn,
+    {{#each columns}}
+    {
+      accessorKey: '{{this.name}}',
+      header: '{{this.name}}',
+      cell: (info) => {
+        const value = info.getValue();
+        {{#if (eq this.type 'Number')}}
+        return value ? `$${Number(value).toLocaleString()}` : '-';
+        {{else if (eq this.type 'Date')}}
+        return value ? new Date(value).toLocaleDateString() : '-';
+        {{else if (eq this.type 'Boolean')}}
+        return value ? 'Yes' : 'No';
+        {{else}}
+        return value || '-';
+        {{/if}}
+      },
+      {{#if (eq this.type 'Number')}}
+      meta: {
+        filterVariant: 'range',
+      },
+      filterFn: 'between',
+      {{/if}}
+    },
+    {{/each}}
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: (info) => {
+        const id = info.row.original.{{@root.primaryKey}};
+
+        return (
+          <ActionsCell
+            id={id}
+            onView={() =>
+              navigate(
+                `/{{parentName}}s/${ {{parentName}}Id }/{{childName}}s/${id}`
+              )
+            }
+            onEdit={
+              hasPermission('{{permissionPrefix}}.edit_{{permissionPrefix}}')
+                ? () => onEdit(info.row.original)
+                : undefined
+            }
+            onDelete={
+              hasPermission('{{permissionPrefix}}.delete_{{permissionPrefix}}')
+                ? () => onDelete(info.row.original)
+                : undefined
+            }
+          />
+        );
+      },
+    },
+  ], [
+    navigate,
+    {{parentName}}Id,
+    onEdit,
+    onDelete,
+    hasPermission,
+  ]);
+
+  return columns;
+};

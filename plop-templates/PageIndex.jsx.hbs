@@ -1,0 +1,112 @@
+import { useCallback, useEffect, memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router';
+import { useOutletContext } from 'react-router';
+
+import Breadcrumb from '../../components/Common/Breadcrumb';
+import DeleteModal from '../../components/Common/DeleteModal';
+import TableContainer from '../../components/Common/TableContainer';
+import TreeSearchWrapper from '../../components/Common/TreeSearchWrapper';
+import { usePermissions } from '../../hooks/usePermissions';
+import { useUrlPagination } from '../../hooks/useUrlPagination';
+import {
+  useDelete{{capitalizedPageName}},
+  useSearch{{pluralize capitalizedPageName}},
+} from '../../queries/{{pageName}}s_query';
+import { {{pageName}}ExportColumns } from '../../utils/exportColumnsForLists';
+import { use{{capitalizedPageName}}Columns } from './columns';
+
+function {{capitalizedPageName}}s() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [exportSearchParams, setExportSearchParams] = useState({});
+  const { t } = useTranslation();
+  const { pageFilter, searchConfig } = useOutletContext();
+  const { hasPermission } = usePermissions();
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [{{pageName}}ToDelete, set{{capitalizedPageName}}ToDelete] = useState(null);
+
+  const delete{{capitalizedPageName}}Mutation = useDelete{{capitalizedPageName}}();
+
+  const handleDeleteClick = useCallback(({{pageName}}) => {
+    set{{capitalizedPageName}}ToDelete({{pageName}});
+    setDeleteModal(true);
+  }, []);
+
+  const confirmDelete = async () => {
+    if ({{pageName}}ToDelete?.{{@root.primaryKey}} ) {
+      try {
+        await delete{{capitalizedPageName}}Mutation.mutateAsync({{pageName}}ToDelete.{{@root.primaryKey}} );
+        setDeleteModal(false);
+        set{{capitalizedPageName}}ToDelete(null);
+      } catch {
+        // Error handling is managed globally by QueryProvider
+      }
+    }
+  };
+
+  const { pagination, onChange } = useUrlPagination(
+    pageFilter.filters,
+    pageFilter.setFilters
+  );
+
+  useEffect(() => {
+    document.title = t('{{pluralize pageName}}');
+  }, [t]);
+
+  const handleAddClick = useCallback(() => {
+    const search = searchParams.toString();
+    navigate(`/{{pageName}}s/add${search ? `?${search}` : ''}`);
+  }, [navigate, searchParams]);
+
+  const columns = use{{capitalizedPageName}}Columns(handleDeleteClick, hasPermission);
+
+  const breadcrumbItems = [{ label: t('{{pluralize pageName}}'), active: true }];
+
+  return (
+    <>
+      <div className="page-content">
+        <Breadcrumb items={breadcrumbItems} />
+        <>
+          <TreeSearchWrapper
+            pageFilter={pageFilter}
+            searchConfig={searchConfig}
+            setExportSearchParams={setExportSearchParams}
+          >
+            {({ result, isLoading }) => {
+              return (
+                <TableContainer
+                  data={result?.results ?? []}
+                  columns={columns}
+                  isLoading={isLoading}
+                  isGlobalFilter={true}
+                  isAddButton={hasPermission('{{permissionPrefix}}.add_{{permissionPrefix}}')}
+                  isCustomPageSize={true}
+                  isPagination={true}
+                  onAddClick={handleAddClick}
+                  tableName={t('{{pluralize pageName}}')}
+                  exportColumns={ {{pageName}}ExportColumns }
+                  exportSearchParams={exportSearchParams}
+                  paginationState={pagination}
+                  isServerSidePagination={true}
+                  onPaginationChange={onChange}
+                  totalRows={result?.pagination?.total}
+                  pageCount={result?.pagination?.total_pages}
+                />
+              );
+            }}
+          </TreeSearchWrapper>
+        </>
+        <DeleteModal
+          isOpen={deleteModal}
+          toggle={() => setDeleteModal(false)}
+          onDeleteClick={confirmDelete}
+          isPending={delete{{capitalizedPageName}}Mutation.isPending}
+          itemName={ {{pageName}}ToDelete?.title || {{pageName}}ToDelete?.name }
+        />
+      </div>
+    </>
+  );
+}
+
+export default memo({{capitalizedPageName}}s);

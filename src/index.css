@@ -1,0 +1,261 @@
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  zoom: 90%;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+.ag-root-wrapper {
+  z-index: 0;
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.tree-row-enter {
+  animation: fadeInRow 0.2s ease-out;
+}
+
+.min-vh-50 {
+  min-height: 50vh !important;
+}
+
+.detail-layout-content {
+  min-height: calc(100vh - 200px);
+}
+
+.modal-90w {
+  max-width: 90%;
+}
+
+.modal-xl {
+  max-width: 85% !important;
+}
+.modal-content {
+  min-height: 85%;
+}
+
+.dashed-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.dashed-input-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.dashed-input-container {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.dashed-input {
+  width: 100%;
+  padding: 0.25rem 0;
+  border: none;
+  border-bottom: 2px dashed #adb5bd;
+  background: transparent;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #212529;
+  transition: border-bottom-color 0.2s ease;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.dashed-input:hover:not(:focus) {
+  border-bottom-color: #6c757d;
+}
+
+.dashed-input:focus {
+  outline: none;
+  border-bottom-color: transparent;
+  border-bottom-style: dashed;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+.dashed-input::placeholder {
+  color: #999;
+  font-style: italic;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.dashed-input-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, #28a745 0%, #28a745 50%, transparent 50%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  opacity: 0;
+  transition:
+    background-position 0.3s ease,
+    opacity 0.15s ease;
+}
+
+.dashed-input:focus ~ .dashed-input-line {
+  opacity: 1;
+  background-position: 0% 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dashed-input {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-bottom-color: #6c757d;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px 4px 0 0 !important;
+  }
+
+  .dashed-input::placeholder {
+    color: #666;
+  }
+
+  .dashed-input:focus {
+    background-color: #ffffff;
+    border-bottom-color: transparent;
+  }
+
+  .dashed-input:focus ~ .dashed-input-line {
+    background: linear-gradient(
+      90deg,
+      #34ce57 0%,
+      #34ce57 50%,
+      transparent 50%
+    );
+    background-size: 200% 100%;
+    background-position: 0% 0;
+  }
+}
+
+.offcanvas-backdrop,
+.modal-backdrop {
+  height: 100% !important;
+  width: 100% !important;
+}
+.offcanvas-backdrop,
+.modal-backdrop {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.letter-editor .ql-editor {
+  text-align: justify;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.letter-editor .ql-editor p {
+  margin-bottom: 12px;
+}
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 8px);
+
+  background: #000;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+
+  z-index: 9999;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip-wrapper::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 8px);
+
+  background: #000;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+
+  z-index: 9999;
+}
+
+.tooltip-wrapper:hover::after {
+  opacity: 1;
+}
+
+[data-tooltip]::after,
+.tooltip-wrapper::after {
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  transform: translate(-50%, 4px);
+}
+
+td,
+th {
+  position: relative;
+}
+
+td:hover,
+th:hover {
+  z-index: 10 !important;
+}
+
+.pinned-left:hover,
+.pinned-right:hover {
+  z-index: 20 !important;
+}
+
+.tooltip-wrapper::after,
+[data-tooltip]::after {
+  z-index: 9999;
+}

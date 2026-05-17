@@ -1,18 +1,9 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
-
-import { useAuth } from '../../hooks/useAuth';
-
-const InvestorSelfDashboard = lazy(() => import('./InvestorSelfDashboard'));
-
-const SupersetDashboard = lazy(() => import('./SupersetDashboard'));
 
 const INVESTOR_USER_TYPE = 3;
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const isInvestor = user?.usr_user_type === INVESTOR_USER_TYPE;
-
   useEffect(() => {
     document.title = 'Dashboard';
   }, []);
@@ -28,7 +19,7 @@ const Dashboard = () => {
         </div>
       }
     >
-      {isInvestor ? <InvestorSelfDashboard /> : <SupersetDashboard />}
+      <h1>Dashboard</h1>
     </Suspense>
   );
 };

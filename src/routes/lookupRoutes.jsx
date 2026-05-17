@@ -9,7 +9,7 @@ const LookupsLayout = lazy(() => import('../pages/lookups/Layout'));
 const lookupRoutes = {
   path: '/lookups',
   element: <LookupsLayout />,
-  // permission: 'lookup.view_lookup',
+  permission: 'lookups.view_lookup',
   children: [
     {
       index: true,
@@ -22,7 +22,7 @@ const lookupRoutes = {
     {
       path: 'type/:typeId/add',
       element: <AddLookup />,
-      permission: 'lookup.add_lookup',
+      permission: 'lookups.add_lookup',
     },
     {
       path: 'type/:typeId/:id',
@@ -31,7 +31,7 @@ const lookupRoutes = {
     {
       path: 'type/:typeId/:id/edit',
       element: <EditLookup />,
-      permission: 'lookup.edit_lookup',
+      permission: 'lookups.change_lookup',
     },
   ],
 };

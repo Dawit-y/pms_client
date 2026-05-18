@@ -8,14 +8,20 @@ WORKDIR /app
 # Enable pnpm via corepack (ships with Node).
 RUN corepack enable
 
-# Install deps first for layer caching. HUSKY=0 disables the `prepare` hook
-# (which runs `husky` and fails because .git isn't in the Docker build context).
-# pnpm-workspace.yaml holds pnpm 11's `onlyBuiltDependencies` whitelist —
-# without it pnpm exits 1 on packages with install scripts (esbuild etc.).
-ENV HUSKY=0
+# Install deps first for layer caching.
+# --ignore-scripts skips ALL lifecycle scripts during install. That's what we
+# want in a Docker build for two reasons:
+#   1. husky's `prepare` script fails without a .git directory (which we
+#      correctly exclude from the build context).
+#   2. pnpm 11+ refuses to run install scripts for unwhitelisted packages
+#      (esbuild, @parcel/watcher, etc.) and exits 1 if any are ignored.
+# Skipping scripts is safe for this stack: esbuild and @parcel/watcher ship
+# their platform binaries as optional dependencies (@esbuild/linux-x64,
+# @parcel/watcher-linux-x64-glibc), so no install script is needed for the
+# Vite build to work. core-js/es5-ext scripts only print sponsor banners.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy the source and build.
 COPY . .

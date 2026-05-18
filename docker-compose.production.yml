@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        # Same-origin: the host nginx proxies /api/v1/ to the Django container,
+        # so the SPA can call the API with a relative URL. No CORS, no extra DNS.
+        VITE_API_URL: /api/v1/
+        VITE_FILE_URL: /
+        VITE_NODE_ENV: production
+    image: pms_client_production_frontend
+    container_name: pms_client_production_frontend
+    restart: unless-stopped
+    ports:
+      # Loopback only — host nginx is the public entry point.
+      - '127.0.0.1:3000:80'

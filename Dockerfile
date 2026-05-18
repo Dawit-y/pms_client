@@ -8,7 +8,9 @@ WORKDIR /app
 # Enable pnpm via corepack (ships with Node).
 RUN corepack enable
 
-# Install deps first for layer caching.
+# Install deps first for layer caching. HUSKY=0 disables the `prepare` hook
+# (which runs `husky` and fails because .git isn't in the Docker build context).
+ENV HUSKY=0
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile

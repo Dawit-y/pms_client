@@ -101,13 +101,5 @@
     "**/*.{js,jsx,json,md,html,css,less,scss}": [
       "prettier --write"
     ]
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "core-js",
-      "es5-ext",
-      "esbuild"
-    ]
   }
 }

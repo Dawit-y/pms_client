@@ -10,8 +10,10 @@ RUN corepack enable
 
 # Install deps first for layer caching. HUSKY=0 disables the `prepare` hook
 # (which runs `husky` and fails because .git isn't in the Docker build context).
+# pnpm-workspace.yaml holds pnpm 11's `onlyBuiltDependencies` whitelist —
+# without it pnpm exits 1 on packages with install scripts (esbuild etc.).
 ENV HUSKY=0
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 

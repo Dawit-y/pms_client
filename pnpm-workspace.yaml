@@ -1,0 +1,12 @@
+# pnpm 11+ reads workspace/install settings from this file (the
+# "pnpm.*" field in package.json is no longer honored).
+#
+# Whitelist the dependencies whose install/postinstall scripts pnpm is
+# allowed to run. Without this, pnpm 11 exits 1 in CI/Docker builds.
+# esbuild needs its script to fetch the platform-specific bundler binary;
+# the others print sponsor banners or build native modules.
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - core-js
+  - es5-ext
+  - esbuild

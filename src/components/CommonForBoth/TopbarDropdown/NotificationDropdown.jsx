@@ -1,20 +1,36 @@
 import { useMemo } from 'react';
-import { Dropdown, Row, Col, Button } from 'react-bootstrap';
+import { Dropdown, Row, Col } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { FaBell, FaRegClock, FaArrowAltCircleRight } from 'react-icons/fa';
 import { Link } from 'react-router';
 import SimpleBar from 'simplebar-react';
 
-import { useFetchNotifications } from '../../../queries/notifications_query';
+import {
+  useFetchNotifications,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+} from '../../../queries/notifications_query';
+
+const formatNotificationDate = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleString();
+};
 
 const NotificationDropdown = () => {
   const { t } = useTranslation();
 
   const { data, isLoading, isError } = useFetchNotifications();
+  const markOne = useMarkNotificationAsRead();
+  const markAll = useMarkAllNotificationsAsRead();
 
-  const unreadNotCount = useMemo(() => {
-    return data?.data?.filter((not) => not.not_is_read === 0).length;
-  }, [data]);
+  const notifications = useMemo(() => data?.data || [], [data]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.is_read).length,
+    [notifications]
+  );
 
   return (
     <Dropdown className="dropdown d-inline-block" tag="li">
@@ -25,8 +41,8 @@ const NotificationDropdown = () => {
         id="page-header-notifications-dropdown"
       >
         <FaBell className="bx-tada" size={20} />
-        {unreadNotCount > 0 && (
-          <span className="badge bg-danger rounded-pill">{unreadNotCount}</span>
+        {unreadCount > 0 && (
+          <span className="badge bg-danger rounded-pill">{unreadCount}</span>
         )}
       </Dropdown.Toggle>
 
@@ -36,6 +52,18 @@ const NotificationDropdown = () => {
             <Col>
               <h6 className="m-0">{t('notifications')}</h6>
             </Col>
+            {unreadCount > 0 && (
+              <Col xs="auto">
+                <button
+                  type="button"
+                  className="btn btn-link btn-sm p-0"
+                  onClick={() => markAll.mutate()}
+                  disabled={markAll.isPending}
+                >
+                  {t('mark_all_as_read')}
+                </button>
+              </Col>
+            )}
           </Row>
         </div>
 
@@ -45,37 +73,42 @@ const NotificationDropdown = () => {
           </h6>
         )}
 
-        {!isError && data?.data?.length === 0 && (
+        {!isError && !isLoading && notifications.length === 0 && (
           <h6 className="p-3 text-center">{t('no_new_notifications')}</h6>
         )}
 
         {isLoading && <div className="p-3 text-center">{t('loading')}</div>}
 
-        {!isLoading && data?.data?.length > 0 && (
+        {!isLoading && notifications.length > 0 && (
           <SimpleBar style={{ height: '230px' }}>
-            {data?.data?.map((notification, index) => (
+            {notifications.map((notification) => (
               <Link
                 to="/notifications"
-                key={index}
-                className="text-reset notification-item"
+                key={notification.uuid}
+                className={`text-reset notification-item ${
+                  notification.is_read ? '' : 'fw-semibold'
+                }`}
+                onClick={() => {
+                  if (!notification.is_read) {
+                    markOne.mutate(notification.uuid);
+                  }
+                }}
               >
                 <div className="d-flex">
                   <div className="avatar-xs me-3">
                     <span className="avatar-title bg-primary rounded-circle font-size-16">
-                      <i
-                        className={`bx bx-${notification.not_type.toLowerCase()}`}
-                      />
+                      <FaBell />
                     </span>
                   </div>
                   <div className="flex-grow-1">
                     <h6 className="mt-0 mb-1">
-                      {t(notification.not_type.toLowerCase())}
+                      {notification.actor_email || t('notification')}
                     </h6>
                     <div className="font-size-12 text-muted">
-                      <p className="mb-1">{t(notification.not_detail)}</p>
+                      <p className="mb-1">{notification.verb}</p>
                       <p className="mb-0">
                         <FaRegClock className="me-1" />
-                        {notification.not_date}
+                        {formatNotificationDate(notification.created_at)}
                       </p>
                     </div>
                   </div>
@@ -86,7 +119,7 @@ const NotificationDropdown = () => {
         )}
 
         <div className="p-2 border-top d-grid">
-          {data?.data?.length > 0 && (
+          {notifications.length > 0 && (
             <Link
               className="btn btn-sm btn-link font-size-14 btn-block text-center"
               to="/notifications"

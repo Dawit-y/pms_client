@@ -95,7 +95,7 @@ const TreeForLists = ({
       if (Object.keys(nodeData).length === 0) return {};
       return {
         ...nodeData,
-        level: nodeData.level || 'unknown',
+        location_type: nodeData.location_type || 'unknown',
       };
     });
   };
@@ -131,7 +131,7 @@ const TreeForLists = ({
         setTimeout(() => {
           setSelectedNode({
             ...node,
-            level: node.level || 'unknown',
+            location_type: node.location_type || 'unknown',
           });
           // Select and scroll to the active node
           treeRef.current?.select(activeNodeId);
@@ -157,11 +157,11 @@ const TreeForLists = ({
     const searchTerm = term.toLowerCase();
     const getNodeName = (node) => {
       if (!node?.data) return '';
-      if (lang === 'en' && node.data.add_name_en)
-        return node.data.add_name_en.toLowerCase();
-      if (lang === 'am' && node.data.add_name_am)
-        return node.data.add_name_am.toLowerCase();
-      return node.data.name?.toLowerCase() || '';
+      if (lang === 'en' && node.dataname_en)
+        return node.dataname_en.toLowerCase();
+      if (lang === 'am' && node.dataname_am)
+        return node.dataname_am.toLowerCase();
+      return node.data.name_or?.toLowerCase() || '';
     };
     const nameExists = (currentNode) => {
       if (getNodeName(currentNode).includes(searchTerm)) return true;
@@ -298,11 +298,11 @@ const TreeForLists = ({
                       style={{ cursor: 'pointer' }}
                       onClick={() => handleNodeSelect({})}
                       data-tooltip={
-                        lang === 'en' && selectedNode.add_name_en
-                          ? selectedNode.add_name_en
-                          : lang === 'am' && selectedNode.add_name_am
-                            ? selectedNode.add_name_am
-                            : selectedNode.name
+                        lang === 'en' && selectedNode.name_en
+                          ? selectedNode.name_en
+                          : lang === 'am' && selectedNode.name_am
+                            ? selectedNode.name_am
+                            : selectedNode.name_or
                       }
                     >
                       <span className="text-warning">
@@ -312,7 +312,7 @@ const TreeForLists = ({
                         className="text-danger"
                         style={{ fontWeight: 900, fontSize: '0.9rem' }}
                       >
-                        {selectedNode.level?.charAt(0).toUpperCase()}
+                        {selectedNode.location_type?.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   )}
@@ -433,25 +433,25 @@ const Node = ({ node, style, dragHandle, onNodeSelect, isActive }) => {
         node.isSelected || isActive ? 'bg-info-subtle' : ''
       } py-1 rounded hover-zoom ${isActive ? 'border-start border-primary border-3' : ''}`}
       data-tooltip={
-        lang === 'en' && node.data.add_name_en
-          ? node.data.add_name_en
-          : lang === 'am' && node.data.add_name_am
-            ? node.data.add_name_am
-            : node.data.name
+        lang === 'en' && node.data.name_en
+          ? node.data.name_en
+          : lang === 'am' && node.data.name_am
+            ? node.data.name_am
+            : node.data.name_or
       }
     >
-      {!isLeafNode && node.data.level !== 'woreda' && (
+      {!isLeafNode && node.data.location_type !== 'woreda' && (
         <span className="me-2 ps-2">{chevronIcon}</span>
       )}
       <span
         className={`${
-          node.data.level === 'woreda' ? 'ms-4' : ''
+          node.data.location_type === 'woreda' ? 'ms-4' : ''
         }  me-1 text-warning`}
       >
         <FaFolder />
       </span>
       <span className="text-danger my-auto px-1" style={{ fontWeight: 900 }}>
-        {node.data.level.charAt(0).toUpperCase()}
+        {node.data.location_type.charAt(0).toUpperCase()}
       </span>
       <span
         style={{
@@ -463,11 +463,11 @@ const Node = ({ node, style, dragHandle, onNodeSelect, isActive }) => {
           verticalAlign: 'middle',
         }}
       >
-        {lang === 'en' && node.data.add_name_en
-          ? node.data.add_name_en
-          : lang === 'am' && node.data.add_name_am
-            ? node.data.add_name_am
-            : node.data.name}
+        {lang === 'en' && node.data.name_en
+          ? node.data.name_en
+          : lang === 'am' && node.data.name_am
+            ? node.data.name_am
+            : node.data.name_or}
       </span>
     </div>
   );

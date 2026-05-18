@@ -1,0 +1,203 @@
+/* Table base styles */
+.rpt-table {
+  border-collapse: collapse !important;
+  border: 1px solid #dee2e6 !important;
+  font-size: 0.82rem;
+}
+
+.rpt-table thead,
+.rpt-table tbody,
+.rpt-table tr,
+.rpt-table th,
+.rpt-table td {
+  border: 1px solid #dee2e6 !important;
+}
+
+.rpt-table th {
+  position: relative;
+  background-color: #f0f4f8 !important;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 6px 10px !important;
+}
+
+.rpt-table td {
+  padding: 4px 8px !important;
+}
+
+/* Generic collapsible group header row (used by keyGroupedData mode) */
+.rpt-group-header-row {
+  background-color: #e8f4f0 !important;
+  cursor: pointer;
+}
+
+.rpt-group-header-row td {
+  background-color: #e8f4f0 !important;
+  font-weight: 600;
+}
+
+.rpt-group-header-row:hover td {
+  background-color: #d4e8e0 !important;
+}
+
+/* Generic child data rows */
+.rpt-data-row {
+  background-color: #ffffff !important;
+}
+
+.rpt-data-row:nth-child(even) {
+  background-color: #f5faf8 !important;
+}
+
+.rpt-data-row td:first-child {
+  border-left: 3px solid #6dba9f !important;
+}
+
+/* Legacy group row */
+.group-row {
+  background-color: #e8f4f0 !important;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.group-row:hover {
+  background-color: #d4e8e0 !important;
+}
+
+.group-row td {
+  background-color: #e8f4f0 !important;
+}
+
+/* Grand total row */
+.grand-total-row {
+  background-color: #ffe5cc !important;
+  font-weight: bold;
+}
+
+.grand-total-row td {
+  background-color: #ffe5cc !important;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.resize-handle:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Sticky columns */
+.sticky-column {
+  position: sticky;
+  z-index: 1;
+  background-color: white !important;
+}
+
+.sticky-header {
+  position: sticky;
+  z-index: 2;
+  background-color: #f0f4f8 !important;
+}
+
+/* Group toggle icon */
+.group-toggle {
+  margin-right: 6px;
+}
+
+.rpt-toggle-icon {
+  transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Search input icon positioning */
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Dropdown menu */
+.columns-dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Pagination */
+.pagination {
+  font-size: 0.875rem;
+}
+
+/* Rows per page selector */
+.rows-per-page-selector {
+  position: relative;
+  width: 80px;
+}
+
+.rows-per-page-selector select {
+  appearance: none;
+  padding-right: 25px;
+}
+
+.rows-per-page-selector .dropdown-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* No data message */
+.no-data-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+/* Controls container */
+.controls-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Search input wrapper */
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input {
+  padding-left: 35px;
+}
+
+/* Group header with chevron */
+.group-header-content {
+  display: flex;
+  align-items: center;
+}
+
+.group-toggle-icon {
+  margin-right: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .controls-container .d-flex {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .search-wrapper {
+    max-width: 100%;
+  }
+}

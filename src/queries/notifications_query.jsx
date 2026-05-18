@@ -1,58 +1,78 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { post, get } from '../helpers/axios';
+import { get, post } from '../helpers/axios';
 
-// Helper functions
 const fetchNotifications = async () => {
-  try {
-    const response = await get('notifications/');
-    return response;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  return await get('notifications/');
 };
 
-const markNotificationsAsRead = async (notificationIds) => {
-  try {
-    const response = await post(
-      `notifications/update/?notification_ids=${notificationIds}`
-    );
-    return response;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+const fetchUnreadCount = async () => {
+  return await get('notifications/unread-count/');
 };
 
-// Custom Hook to Fetch Notifications
+const markOneAsRead = async (uuid) => {
+  return await post(`notifications/${uuid}/read/`);
+};
+
+const markAllAsRead = async () => {
+  return await post('notifications/read-all/');
+};
+
 export const useFetchNotifications = () => {
   return useQuery({
     queryKey: ['notifications'],
-    queryFn: () => fetchNotifications(),
+    queryFn: fetchNotifications,
     staleTime: 5 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     retry: 2,
   });
 };
 
-// Custom Hook to Mark Notifications as Read
-export const useMarkNotificationsAsRead = () => {
+export const useUnreadNotificationCount = () => {
+  return useQuery({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: fetchUnreadCount,
+    staleTime: 60 * 1000,
+    retry: 1,
+  });
+};
+
+export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: markNotificationsAsRead,
-    onSuccess: (_, notificationIds) => {
+    mutationFn: markOneAsRead,
+    onSuccess: (_, uuid) => {
       queryClient.setQueryData(['notifications'], (oldData) => {
-        if (!oldData) return oldData;
-
-        return oldData.map((notification) =>
-          notificationIds.includes(notification.id)
-            ? { ...notification, read: true }
-            : notification
-        );
+        if (!oldData?.data) return oldData;
+        return {
+          ...oldData,
+          data: oldData.data.map((n) =>
+            n.uuid === uuid ? { ...n, is_read: true } : n
+          ),
+        };
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'unread-count'],
       });
     },
-    onError: (error) => {
-      console.error('Error marking notifications as read:', error);
+  });
+};
+
+export const useMarkAllNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markAllAsRead,
+    onSuccess: () => {
+      queryClient.setQueryData(['notifications'], (oldData) => {
+        if (!oldData?.data) return oldData;
+        return {
+          ...oldData,
+          data: oldData.data.map((n) => ({ ...n, is_read: true })),
+        };
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'unread-count'],
+      });
     },
   });
 };

@@ -2,8 +2,9 @@ import { lazy } from 'react';
 
 import lookupRoutes from './lookupRoutes';
 import lookTypeRoutes from './lookupTypeRoutes';
-import userRoutes from './userRoutes';
+import reportRoutes from './reportRoutes';
 import roleRoutes from './roleRoutes';
+import userRoutes from './userRoutes';
 
 const Login = lazy(() => import('../pages/auth/Login'));
 const Dashboard = lazy(() => import('../pages/dashboard'));
@@ -13,6 +14,7 @@ export const protectedRoutes = [
   lookupRoutes,
   userRoutes,
   roleRoutes,
+  reportRoutes,
   {
     path: '/dashboard',
     element: <Dashboard />,

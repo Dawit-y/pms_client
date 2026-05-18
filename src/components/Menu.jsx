@@ -29,12 +29,24 @@ const menuItems = [
   {
     title: 'project',
     icon: 'FaBriefcase',
-    permissions: ['project.view_project'],
+    permissions: ['projects.view_project'],
     submenu: [
       {
         name: 'project',
         path: '/project',
-        permissions: ['project.view_project'],
+        permissions: ['projects.view_project'],
+      },
+    ],
+  },
+  {
+    title: 'reports',
+    icon: 'FaChartBar',
+    permissions: ['reports.view_reportjob'],
+    submenu: [
+      {
+        name: 'reports',
+        path: '/reports',
+        permissions: ['reports.view_reportjob'],
       },
     ],
   },
